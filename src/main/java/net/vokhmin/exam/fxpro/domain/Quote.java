@@ -7,8 +7,8 @@ import lombok.Value;
 @Value
 public class Quote {
 
-    Symbol symbol;
-    long timestamp;
-    BigDecimal price;
+    public Symbol symbol;
+    public long timestamp;
+    public BigDecimal price;
 
 }

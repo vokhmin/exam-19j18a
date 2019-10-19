@@ -35,17 +35,38 @@ public class TbarHandler implements Runnable {
     public void handle(Quote quote) {
         log.debug("Try to handle a quote {}", quote);
         for (final TrendbarPeriod type : TrendbarPeriod.values()) {
-            if (currents.get(type.ordinal()) == null) {
+            final Trendbar current = currents.get(type.ordinal());
+            if (current == null) {
                 currents.set(
                         type.ordinal(),
-                        Trendbars.newborn(type, quote.getTimestamp(), quote.getPrice())
+                        Trendbars.firstborn(type, quote.getTimestamp(), quote.getPrice())
                 );
             } else {
-
+                switch (
+                        Long.compare(
+                                current.id.timestamp,
+                                Trendbars.bornTime(type, quote.timestamp))
+                ) {
+                    case -1:    // the next trendbar generation
+                        currents.set(
+                                type.ordinal(),
+                                Trendbars.sibling(current, quote)
+                        );
+                    case 0:     // the same trendbar generation
+                        currents.set(
+                                type.ordinal(),
+                                Trendbars.sibling(current, quote)
+                        );
+                    case 1:    // unexpectedly a late quote! the previous trendbar generation
+                        handleLateQuote();
+                }
             }
-            handleByType(type, quote);
         }
         log.debug("The quote {} has been handled", quote);
+    }
+
+    private void handleLateQuote() {
+        log.warn("The belated message has been got! It will be ignored and dropped.");
     }
 
     public Trendbar complete(TrendbarPeriod type, long timestamp) {
