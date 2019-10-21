@@ -52,25 +52,26 @@ public class TbarHandler implements Runnable {
                                 type.ordinal(),
                                 Trendbars.sibling(current, quote)
                         );
+//                        complete(current);
                     case 0:     // the same trendbar generation
                         currents.set(
                                 type.ordinal(),
                                 Trendbars.sibling(current, quote)
                         );
-                    case 1:    // unexpectedly a late quote! the previous trendbar generation
-                        handleLateQuote();
+                    case 1:    // unexpectedly a belated quote! the previous trendbar generation
+                        handleBelatedQuote();
                 }
             }
         }
         log.debug("The quote {} has been handled", quote);
     }
 
-    private void handleLateQuote() {
+    private void handleBelatedQuote() {
         log.warn("The belated message has been got! It will be ignored and dropped.");
     }
 
     public Trendbar complete(TrendbarPeriod type, long timestamp) {
-
+        return null;
     }
 
 }

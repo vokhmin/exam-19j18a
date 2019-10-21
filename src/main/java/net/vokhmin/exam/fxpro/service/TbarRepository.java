@@ -2,11 +2,9 @@ package net.vokhmin.exam.fxpro.service;
 
 import static java.util.Collections.unmodifiableList;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
+import net.vokhmin.exam.fxpro.domain.Symbol;
 import org.springframework.data.repository.CrudRepository;
 
 import net.vokhmin.exam.fxpro.domain.Trendbar;
@@ -14,11 +12,15 @@ import net.vokhmin.exam.fxpro.domain.TrendbarPeriod;
 
 public class TbarRepository implements CrudRepository<Trendbar, Trendbar.ID> {
 
-    private final List<Map<Long, TrendbarPeriod>> periods = unmodifiableList(new ArrayList<>(TrendbarPeriod.values().length));
+    private final Map<Symbol, NavigableMap<<Long, Trendbar>>> data;
+
+    public TbarRepository() {
+        data = new HashMap<>();
+    }
 
     @Override
     public <T extends Trendbar> T save(T tbar) {
-        periods.get(tbar.getId().getType().ordinal()).computeIfPresent()
+        data.get(tbar.id.type.ordinal()).computeIfPresent()
         return null;
     }
 
