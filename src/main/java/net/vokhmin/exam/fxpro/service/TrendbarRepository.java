@@ -1,27 +1,34 @@
 package net.vokhmin.exam.fxpro.service;
 
-import static java.util.Collections.unmodifiableList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.NavigableMap;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentSkipListMap;
 
-import java.util.*;
-
-import net.vokhmin.exam.fxpro.domain.Symbol;
 import org.springframework.data.repository.CrudRepository;
 
 import net.vokhmin.exam.fxpro.domain.Trendbar;
 import net.vokhmin.exam.fxpro.domain.TrendbarPeriod;
 
-public class TbarRepository implements CrudRepository<Trendbar, Trendbar.ID> {
+public class TrendbarRepository implements CrudRepository<Trendbar, Trendbar.ID> {
 
-    private final Map<Symbol, NavigableMap<<Long, Trendbar>>> data;
+    private final List<NavigableMap<Long, Trendbar>> data;
 
-    public TbarRepository() {
-        data = new HashMap<>();
+    public TrendbarRepository() {
+        data = new ArrayList<>(TrendbarPeriod.values().length);
+        Collections.fill(data, new ConcurrentSkipListMap<>());
     }
 
     @Override
     public <T extends Trendbar> T save(T tbar) {
-        data.get(tbar.id.type.ordinal()).computeIfPresent()
-        return null;
+        series(tbar).put(tbar.id.timestamp, tbar);
+        return tbar;
+    }
+
+    private <T extends Trendbar> NavigableMap<Long, Trendbar> series(T tbar) {
+        return data.get(tbar.id.type.ordinal());
     }
 
     @Override
