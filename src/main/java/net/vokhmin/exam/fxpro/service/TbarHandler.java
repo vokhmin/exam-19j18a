@@ -2,7 +2,7 @@ package net.vokhmin.exam.fxpro.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import lombok.extern.slf4j.Slf4j;
 import net.jcip.annotations.NotThreadSafe;
@@ -15,10 +15,10 @@ import net.vokhmin.exam.fxpro.domain.Trendbars;
 @NotThreadSafe
 public class TbarHandler implements Runnable {
 
-    private final BlockingQueue quotes;
+    private final PriorityBlockingQueue<Quote> quotes;
     private final List<Trendbar> currents = new ArrayList<>(TrendbarPeriod.values().length);
 
-    public TbarHandler(BlockingQueue quotesQueue) {
+    public TbarHandler(PriorityBlockingQueue<Quote> quotesQueue) {
         this.quotes = quotesQueue;
     }
 
@@ -50,13 +50,13 @@ public class TbarHandler implements Runnable {
                     case -1:    // the next trendbar generation
                         currents.set(
                                 type.ordinal(),
-                                Trendbars.sibling(current, quote)
+                                Trendbars.offspring(current, quote)
                         );
 //                        complete(current);
                     case 0:     // the same trendbar generation
                         currents.set(
                                 type.ordinal(),
-                                Trendbars.sibling(current, quote)
+                                Trendbars.offspring(current, quote)
                         );
                     case 1:    // unexpectedly a belated quote! the previous trendbar generation
                         handleBelatedQuote();

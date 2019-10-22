@@ -31,7 +31,7 @@ public class TrendbarServiceTest {
     @InjectMocks
     TrendbarService service;
     @Mock
-    TrendbarSeries series;
+    TrendbarStorage series;
     @Mock
     TrendbarRepository repo;
 

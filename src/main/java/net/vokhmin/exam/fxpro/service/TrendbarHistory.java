@@ -1,13 +1,13 @@
 package net.vokhmin.exam.fxpro.service;
 
+import java.util.List;
+
 import lombok.NonNull;
 import net.vokhmin.exam.fxpro.domain.Symbol;
 import net.vokhmin.exam.fxpro.domain.Trendbar;
 import net.vokhmin.exam.fxpro.domain.TrendbarPeriod;
 
-import java.util.List;
-
-public interface HistoryService {
+public interface TrendbarHistory {
 
     List<Trendbar> getSeries(
             @NonNull Symbol symbol,

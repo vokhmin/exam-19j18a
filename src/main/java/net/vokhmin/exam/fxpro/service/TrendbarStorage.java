@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.vokhmin.exam.fxpro.domain.Symbol;
 import net.vokhmin.exam.fxpro.domain.TrendbarPeriod;
 
-public class TrendbarSeries {
+public class TrendbarStorage {
 
     private final Map<Symbol, List<TrendbarRepository>> repos = new ConcurrentHashMap<>();
 

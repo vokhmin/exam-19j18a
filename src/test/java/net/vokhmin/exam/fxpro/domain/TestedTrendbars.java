@@ -29,13 +29,23 @@ public class TestedTrendbars {
                 .build();
     }
 
+    public static Trendbar randomTrendbar(TrendbarPeriod type, long timestamp) {
+        return Trendbar.builder()
+                .id(new Trendbar.ID(type, timestamp))
+                .low(nextBigDecimal())
+                .high(nextBigDecimal())
+                .open(nextBigDecimal())
+                .close(nextBigDecimal())
+                .build();
+    }
+
     private static Trendbar.ID randomTrendbarId(TrendbarPeriod type) {
         return new Trendbar.ID(
                 type,
-                randomTimestamp(type));
+                randomTrendbarTime(type));
     }
 
-    private static long randomTimestamp(TrendbarPeriod type) {
+    private static long randomTrendbarTime(TrendbarPeriod type) {
         return Instant.ofEpochMilli(nextLong())
                 .truncatedTo(type.unit)
                 .toEpochMilli();

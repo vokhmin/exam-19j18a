@@ -13,10 +13,12 @@ import net.vokhmin.exam.fxpro.domain.Symbol;
 import net.vokhmin.exam.fxpro.domain.Trendbar;
 import net.vokhmin.exam.fxpro.domain.TrendbarPeriod;
 
-public class TrendbarService implements HistoryService {
+public class TrendbarService implements TrendbarHistory {
 
     @Autowired
-    private TrendbarSeries series;
+    private TrendbarStorage series;
+
+    // HistoryService implementation ...
 
     @Override
     public List<Trendbar> getSeries(
@@ -32,7 +34,8 @@ public class TrendbarService implements HistoryService {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public void setSeries(TrendbarSeries series) {
+    public void setSeries(TrendbarStorage series) {
         this.series = series;
     }
+
 }

@@ -2,6 +2,7 @@ package net.vokhmin.exam.fxpro.domain;
 
 import java.math.BigDecimal;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Value;
@@ -12,6 +13,7 @@ public class Trendbar {
 
     @Value
     @Builder
+    @AllArgsConstructor
     public static class ID {
         public final TrendbarPeriod type;
         public final long timestamp;

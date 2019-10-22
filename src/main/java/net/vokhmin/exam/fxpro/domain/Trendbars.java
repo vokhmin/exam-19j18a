@@ -15,7 +15,7 @@ public class Trendbars {
         );
     }
 
-    public static Trendbar sibling(Trendbar prev, Quote quote) {
+    public static Trendbar offspring(Trendbar prev, Quote quote) {
         return firstborn(
                 prev.id.type,
                 bornTime(prev.id.type, quote.getTimestamp()),
