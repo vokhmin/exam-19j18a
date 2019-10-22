@@ -15,4 +15,5 @@ public enum TrendbarPeriod {
     TrendbarPeriod(TemporalUnit unit) {
         this.unit = unit;
     }
+
 }

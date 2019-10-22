@@ -1,34 +1,39 @@
 package net.vokhmin.exam.fxpro.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.NavigableMap;
 import java.util.Optional;
+import java.util.SortedMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.stream.Collectors;
 
 import org.springframework.data.repository.CrudRepository;
 
+import lombok.NonNull;
 import net.vokhmin.exam.fxpro.domain.Trendbar;
-import net.vokhmin.exam.fxpro.domain.TrendbarPeriod;
 
-public class TrendbarRepository implements CrudRepository<Trendbar, Trendbar.ID> {
+public class TrendbarRepository implements CrudRepository<Trendbar, Long> {
 
-    private final List<NavigableMap<Long, Trendbar>> data;
+    private final NavigableMap<Long, Trendbar> data = new ConcurrentSkipListMap<>();
 
-    public TrendbarRepository() {
-        data = new ArrayList<>(TrendbarPeriod.values().length);
-        Collections.fill(data, new ConcurrentSkipListMap<>());
+    public Iterable<Trendbar> findAllByTimestampBetween(@NonNull Long from, Long upTo) {
+        return collect(data.subMap(from, upTo));
+    }
+
+    public Iterable<Trendbar> findAllByTimestampGreaterThanEqual(@NonNull Long from) {
+        return collect(data.tailMap(from));
+    }
+
+    private Iterable<Trendbar> collect(SortedMap<Long, Trendbar> map) {
+        return map.entrySet()
+                .stream()
+                .map(e -> e.getValue())
+                .collect(Collectors.toList());
     }
 
     @Override
     public <T extends Trendbar> T save(T tbar) {
-        series(tbar).put(tbar.id.timestamp, tbar);
+        data.put(tbar.id.timestamp, tbar);
         return tbar;
-    }
-
-    private <T extends Trendbar> NavigableMap<Long, Trendbar> series(T tbar) {
-        return data.get(tbar.id.type.ordinal());
     }
 
     @Override
@@ -37,12 +42,12 @@ public class TrendbarRepository implements CrudRepository<Trendbar, Trendbar.ID>
     }
 
     @Override
-    public Optional<Trendbar> findById(Trendbar.ID id) {
-        return Optional.empty();
+    public Optional<Trendbar> findById(Long timestamp) {
+        return Optional.ofNullable(data.get(timestamp));
     }
 
     @Override
-    public boolean existsById(Trendbar.ID id) {
+    public boolean existsById(Long id) {
         return false;
     }
 
@@ -52,17 +57,17 @@ public class TrendbarRepository implements CrudRepository<Trendbar, Trendbar.ID>
     }
 
     @Override
-    public Iterable<Trendbar> findAllById(Iterable<Trendbar.ID> iterable) {
+    public Iterable<Trendbar> findAllById(Iterable<Long> iterable) {
         return null;
     }
 
     @Override
     public long count() {
-        return 0;
+        return data.size();
     }
 
     @Override
-    public void deleteById(Trendbar.ID id) {
+    public void deleteById(Long id) {
 
     }
 

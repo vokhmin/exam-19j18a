@@ -11,6 +11,7 @@ import lombok.Value;
 public class Trendbar {
 
     @Value
+    @Builder
     public static class ID {
         public final TrendbarPeriod type;
         public final long timestamp;
