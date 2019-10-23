@@ -1,17 +1,22 @@
 package net.vokhmin.exam.fxpro.service;
 
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 import static net.vokhmin.exam.fxpro.RandomUtils.nextBigDecimal;
 import static net.vokhmin.exam.fxpro.RandomUtils.nextInt;
 import static net.vokhmin.exam.fxpro.RandomUtils.nextLong;
+import static net.vokhmin.exam.fxpro.domain.TestedTrendbars.assertTrendbar;
 import static net.vokhmin.exam.fxpro.domain.TrendbarPeriod.D1;
 import static net.vokhmin.exam.fxpro.domain.TrendbarPeriod.H1;
 import static net.vokhmin.exam.fxpro.domain.TrendbarPeriod.M1;
 import static net.vokhmin.exam.fxpro.domain.Trendbars.bornTime;
+
+import java.math.BigDecimal;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -40,7 +45,13 @@ public class QuoteServiceTest {
     @Captor
     ArgumentCaptor<Trendbar> barM1;
     @Captor
+    ArgumentCaptor<Trendbar> barM2;
+    @Captor
+    ArgumentCaptor<Trendbar> barM3;
+    @Captor
     ArgumentCaptor<Trendbar> barH1;
+    @Captor
+    ArgumentCaptor<Trendbar> barH2;
     @Captor
     ArgumentCaptor<Trendbar> barD1;
 
@@ -58,6 +69,65 @@ public class QuoteServiceTest {
 
     @AfterMethod
     public void tearDown() {
+    }
+
+    @Test
+    public void testHandle() {
+        // given:
+        final long timestamp = bornTime(D1, nextLong());
+        final BigDecimal price = nextBigDecimal();
+        final Quote quoteA = new Quote(
+                symbol,
+                timestamp,
+                price);
+        final Quote quoteB = new Quote(
+                symbol,
+                timestamp + 1,
+                price.add(BigDecimal.ONE));
+        final Quote quoteC = new Quote(
+                symbol,
+                timestamp + 2,
+                price.subtract(BigDecimal.ONE));
+        final Quote quoteM1 = new Quote(
+                symbol,
+                timestamp + nextInt(M1.milliseconds()) + M1.milliseconds(),
+                nextBigDecimal());
+        {// when:
+            service.handle(quoteA, quoteB, quoteC, quoteM1);
+            // then:
+            verify(repoM1, times(1)).save(barM1.capture());
+            assertTrendbar(barM1.getAllValues().get(0), M1, timestamp, quoteC.price, quoteB.price, quoteA.price, quoteC.price);
+            verifyNoMoreInteractions(repoM1, repoH1, repoD1);
+        }
+        final Quote quoteH1 = new Quote(
+                symbol,
+                timestamp + H1.milliseconds() + nextInt(M1.milliseconds()),
+                nextBigDecimal());
+        {// and:
+            service.handle(quoteA, quoteB, quoteC, quoteH1);
+            // then:
+            verify(repoM1, times(2)).save(barM2.capture());
+            assertTrendbar(barM2.getAllValues().get(1), M1, timestamp + M1.milliseconds(), quoteM1, quoteM1, quoteM1, quoteM1);
+            verify(repoH1).save(barH1.capture());
+            assertTrendbar(barH1.getAllValues().get(0), H1, timestamp, quoteC.price, quoteB.price, quoteA.price, quoteC.price);
+            verifyNoMoreInteractions(repoM1, repoH1, repoD1);
+        }
+        final Quote quoteD1 = new Quote(
+                symbol,
+                timestamp + nextInt(D1.milliseconds()) + D1.milliseconds(),
+                nextBigDecimal());
+        {// and:
+            service.handle(quoteA, quoteB, quoteC, quoteD1);
+            // then:
+            verify(repoM1, times(3)).save(barM3.capture());
+            assertTrendbar(barM3.getAllValues().get(2), M1, timestamp + H1.milliseconds(), quoteH1, quoteH1, quoteH1, quoteH1);
+            verify(repoH1, times(2)).save(barH2.capture());
+            assertTrendbar(barH2.getAllValues().get(1), H1, timestamp + H1.milliseconds(), quoteH1, quoteH1, quoteH1, quoteH1);
+            verify(repoD1).save(barD1.capture());
+            final Trendbar actual = barD1.getValue();
+            assertTrendbar(actual, D1, timestamp, quoteC.price, quoteB.price, quoteA.price, quoteC.price);
+            verifyNoMoreInteractions(repoM1, repoH1, repoD1);
+        }
     }
 
     @Test

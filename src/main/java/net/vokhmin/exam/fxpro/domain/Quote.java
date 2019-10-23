@@ -11,4 +11,8 @@ public class Quote {
     public long timestamp;
     public BigDecimal price;
 
+    public static Quote quoteOf(Symbol symbol, long timestamp, BigDecimal price) {
+        return new Quote(symbol, timestamp, price);
+    }
+
 }

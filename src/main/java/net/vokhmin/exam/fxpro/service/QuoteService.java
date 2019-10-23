@@ -18,8 +18,8 @@ public class QuoteService implements QuoteHandler {
     }
 
     private Trendbar onComplete(Symbol symbol, Trendbar bar) {
-        storage.get(symbol, bar.id.type).save(bar);
-        return null;
+        log.debug("A new trendbar for Symbol:{} is completed - {}", symbol, bar);
+        return storage.get(symbol, bar.id.type).save(bar);
     }
 
     public void handle(Quote... quotes) {
@@ -42,13 +42,10 @@ public class QuoteService implements QuoteHandler {
                 switch (Long.compare(current.id.timestamp, origin)) {
                     case -1:    // the next trendbar generation
                         onComplete(quote.symbol, current);
-//                        currents.set(
-//                                type.ordinal(),
-//                                Trendbars.offspring(current, quote)
-//                        );
-//                        break;
+                        currents[type.ordinal()] = Trendbars.newborn(current, quote);
+                        break;
                     case 0:     // the same trendbar generation
-                        currents[type.ordinal()] = Trendbars.offspring(current, quote);
+                        currents[type.ordinal()] = Trendbars.mutant(current, quote);
                         break;
                     case 1:    // unexpectedly a belated quote! the previous trendbar generation
                         handleBelated(quote);
@@ -61,7 +58,7 @@ public class QuoteService implements QuoteHandler {
 
     @Override
     public void handleBelated(Quote quote) {
-        log.warn("The belated message has been got! It will be ignored and dropped.");
+        log.warn("The belated quote has been got! It will be dropped - {}", quote);
     }
 
 }

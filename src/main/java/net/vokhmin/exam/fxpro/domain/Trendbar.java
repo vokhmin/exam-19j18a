@@ -20,9 +20,9 @@ public class Trendbar {
     }
 
     public final ID id;
-    BigDecimal open;
-    BigDecimal close;
-    BigDecimal low;
-    BigDecimal high;
+    private BigDecimal open;
+    private BigDecimal close;
+    private BigDecimal low;
+    private BigDecimal high;
 
 }
