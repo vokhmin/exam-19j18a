@@ -15,7 +15,7 @@ import net.vokhmin.exam.fxpro.domain.Quote;
 import net.vokhmin.exam.fxpro.domain.Symbol;
 
 @Slf4j
-public class SimpleQuoteProducer implements Runnable, QuoteHandler {
+public class SimpleQuoteProducer extends AbstractQuoteProducer implements Runnable, QuoteHandler {
 
     private static final int SLEEP_LIMIT_MS = 10000;
     private static final int PRICE_MAX = 100;
@@ -25,7 +25,6 @@ public class SimpleQuoteProducer implements Runnable, QuoteHandler {
     private final BlockingQueue<Quote> quotes;
     private final TimeService time;
     private final Random random = new Random();
-    private volatile boolean active;
 
     public SimpleQuoteProducer(BlockingQueue<Quote> quotes, TimeService time) {
         this.quotes = quotes;
@@ -77,4 +76,5 @@ public class SimpleQuoteProducer implements Runnable, QuoteHandler {
     public void handleBelated(Quote quote) {
         throw new UnsupportedOperationException();
     }
+
 }
