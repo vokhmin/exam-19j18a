@@ -27,6 +27,7 @@ public class SimpleQuoteProducer extends AbstractQuoteProducer implements Runnab
     private final Random random = new Random();
 
     public SimpleQuoteProducer(BlockingQueue<Quote> quotes, TimeService time) {
+        super(null);
         this.quotes = quotes;
         this.time = time;
     }
@@ -35,7 +36,7 @@ public class SimpleQuoteProducer extends AbstractQuoteProducer implements Runnab
     public void run() {
         try {
             BigDecimal prev = valueOf(random.nextDouble() * random.nextInt(PRICE_MAX));
-            while (active) {
+            while (isRunning()) {
                 Thread.sleep(random.nextInt(SLEEP_LIMIT_MS));
                 final Quote quote = quoteOf(randomSymbol(), now(), randomPrice(prev));
                 log.debug("Try to originate a new quote - {}", quote);
@@ -77,4 +78,8 @@ public class SimpleQuoteProducer extends AbstractQuoteProducer implements Runnab
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    protected Thread newThread() {
+        return null;
+    }
 }

@@ -25,9 +25,9 @@ import net.vokhmin.exam.fxpro.domain.Quote;
 import net.vokhmin.exam.fxpro.domain.Symbol;
 
 @Test
-public class QuoteConsumerTest {
+public class QuoteHandlerWorkerTest {
 
-    QuoteConsumer consumer;
+    QuoteHandlerWorker consumer;
 
     Symbol symbol;
     BlockingQueue<Quote> queue;
@@ -40,7 +40,7 @@ public class QuoteConsumerTest {
     void setUp() {
         initMocks(this);
         queue = new LinkedBlockingQueue<>();
-        consumer = new QuoteConsumer(queue, handler);
+        consumer = new QuoteHandlerWorker(queue, handler);
         symbol = randomSymbol();
     }
 

@@ -11,14 +11,16 @@ import static net.vokhmin.exam.fxpro.RandomUtils.nextLong;
 import static net.vokhmin.exam.fxpro.RandomUtils.randomEnumValue;
 
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import lombok.extern.slf4j.Slf4j;
+import net.vokhmin.exam.fxpro.domain.Quote;
 import net.vokhmin.exam.fxpro.domain.Symbol;
 import net.vokhmin.exam.fxpro.domain.TestedSymbols;
 import net.vokhmin.exam.fxpro.domain.TestedTrendbars;
@@ -28,8 +30,8 @@ import net.vokhmin.exam.fxpro.domain.TrendbarPeriod;
 @Slf4j
 public class TrendbarServiceTest {
 
-    @InjectMocks
     TrendbarService service;
+    BlockingQueue<Quote> queue = new LinkedBlockingQueue<>();
     @Mock
     TrendbarStorage series;
     @Mock
@@ -38,6 +40,8 @@ public class TrendbarServiceTest {
     @BeforeMethod
     public void setUp() {
         initMocks(this);
+        service = new TrendbarService(queue);
+        service.setSeries(series);
     }
 
     @AfterMethod

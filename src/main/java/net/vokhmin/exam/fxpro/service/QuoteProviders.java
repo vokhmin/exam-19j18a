@@ -1,15 +1,17 @@
 package net.vokhmin.exam.fxpro.service;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 public class QuoteProviders {
 
     private final Set<AbstractQuoteProducer> producers = ConcurrentHashMap.newKeySet();
+    private final QuoteConsumer consumer;
 
     boolean register(AbstractQuoteProducer producer) {
         if (producers.contains(producer)) {
@@ -21,7 +23,8 @@ public class QuoteProviders {
             producer.start();
             return true;
         }
-        log.error("Couldn't register the Producer {}", producer)
+        log.error("Couldn't register the Producer {}", producer);
+        return false;
     }
 
     void unregister(AbstractQuoteProducer producer) {
@@ -29,7 +32,8 @@ public class QuoteProviders {
             log.debug("Producer {} has been removed successfully", producer);
             producer.stop();
             return;
-        };
+        }
+        ;
         log.error("Producer {} has not been registered, it could not be found", producer);
     }
 
