@@ -20,7 +20,7 @@ import net.vokhmin.exam.fxpro.domain.TrendbarPeriod;
 
 @Slf4j
 @RequiredArgsConstructor
-public class TrendbarService implements QuoteConsumer, TrendbarHistory {
+public class TrendbarServiceFacade implements QuoteConsumer, TrendbarHistory {
 
     private static final long DELIVERY_TIMEOUT = 100;
 

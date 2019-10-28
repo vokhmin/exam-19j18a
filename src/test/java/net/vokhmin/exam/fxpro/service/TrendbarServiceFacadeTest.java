@@ -28,9 +28,9 @@ import net.vokhmin.exam.fxpro.domain.Trendbar;
 import net.vokhmin.exam.fxpro.domain.TrendbarPeriod;
 
 @Slf4j
-public class TrendbarServiceTest {
+public class TrendbarServiceFacadeTest {
 
-    TrendbarService service;
+    TrendbarServiceFacade service;
     BlockingQueue<Quote> queue = new LinkedBlockingQueue<>();
     @Mock
     TrendbarStorage series;
@@ -40,7 +40,7 @@ public class TrendbarServiceTest {
     @BeforeMethod
     public void setUp() {
         initMocks(this);
-        service = new TrendbarService(queue);
+        service = new TrendbarServiceFacade(queue);
         service.setSeries(series);
     }
 

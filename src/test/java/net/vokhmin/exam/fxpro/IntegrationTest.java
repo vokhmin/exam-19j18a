@@ -35,7 +35,7 @@ import net.vokhmin.exam.fxpro.domain.Symbol;
 import net.vokhmin.exam.fxpro.domain.TrendbarPeriod;
 import net.vokhmin.exam.fxpro.service.QuoteHandlerWorker;
 import net.vokhmin.exam.fxpro.service.TrendbarRepository;
-import net.vokhmin.exam.fxpro.service.TrendbarService;
+import net.vokhmin.exam.fxpro.service.TrendbarServiceFacade;
 import net.vokhmin.exam.fxpro.service.TrendbarStorage;
 
 @Slf4j
@@ -48,7 +48,7 @@ class IntegrationTest {
     @Autowired
     TrendbarStorage storage;
     @Autowired
-    TrendbarService service;
+    TrendbarServiceFacade service;
     @Autowired
     QuoteHandlerWorker worker;
 

@@ -11,7 +11,7 @@ import net.vokhmin.exam.fxpro.domain.QuotePriorityComparator;
 import net.vokhmin.exam.fxpro.service.QuoteHandler;
 import net.vokhmin.exam.fxpro.service.QuoteHandlerWorker;
 import net.vokhmin.exam.fxpro.service.QuoteService;
-import net.vokhmin.exam.fxpro.service.TrendbarService;
+import net.vokhmin.exam.fxpro.service.TrendbarServiceFacade;
 import net.vokhmin.exam.fxpro.service.TrendbarStorage;
 
 @Configuration
@@ -30,10 +30,10 @@ public class TrendbarsConfig {
     }
 
     @Bean
-    TrendbarService trendbarService(
+    TrendbarServiceFacade trendbarService(
             BlockingQueue<Quote> queue
     ) {
-        return new TrendbarService(queue);
+        return new TrendbarServiceFacade(queue);
     }
 
     @Bean
