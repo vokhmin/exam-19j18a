@@ -1,4 +1,4 @@
-package net.vokhmin.exam.fxpro;
+package net.vokhmin.exam.fxpro.integration;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -30,6 +30,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
 import lombok.extern.slf4j.Slf4j;
+import net.vokhmin.exam.fxpro.TrendbarsConfig;
 import net.vokhmin.exam.fxpro.domain.Quote;
 import net.vokhmin.exam.fxpro.domain.Symbol;
 import net.vokhmin.exam.fxpro.domain.TrendbarPeriod;

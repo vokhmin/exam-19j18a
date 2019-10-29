@@ -12,11 +12,7 @@ public class RandomUtils {
     private static final String ALPHABETIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvxyz";
     private static final String ALPHA_NUMERIC_STRING = ALPHABETIC_STRING + "0123456789";
 
-    private static ThreadLocal<Random> random = new ThreadLocal<Random>() {
-        protected Random initialValue() {
-            return new Random();
-        }
-    };
+    private static ThreadLocal<Random> random = ThreadLocal.withInitial(() -> new Random());
 
     public RandomUtils() {
     }

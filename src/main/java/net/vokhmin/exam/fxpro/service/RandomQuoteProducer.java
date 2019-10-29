@@ -22,7 +22,7 @@ public class RandomQuoteProducer implements QuoteProducer {
     private final Random random = new Random();
 
     @Override
-    public Void call() throws InterruptedException {
+    public Void call() {
         try {
             while (true) {
                 Thread.sleep(random.nextInt(200));
@@ -31,7 +31,7 @@ public class RandomQuoteProducer implements QuoteProducer {
                         timeService.currentTimeMillis(),
                         valueOf(random.nextDouble())
                 );
-                log.debug("Try to send a new quote {}", quote);
+                log.debug("Trying to feed a new quote {}", quote);
                 consumer.accept(quote);
             }
         } catch (Exception e) {

@@ -1,10 +1,12 @@
 package net.vokhmin.exam.fxpro.service;
 
+import java.util.ArrayList;
 import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.SortedMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.data.repository.CrudRepository;
 
@@ -38,7 +40,9 @@ public class TrendbarRepository implements CrudRepository<Trendbar, Long> {
 
     @Override
     public <S extends Trendbar> Iterable<S> saveAll(Iterable<S> iterable) {
-        return null;
+        return StreamSupport.stream(iterable.spliterator(), false)
+                .map(it -> save(it))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -48,17 +52,17 @@ public class TrendbarRepository implements CrudRepository<Trendbar, Long> {
 
     @Override
     public boolean existsById(Long id) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Iterable<Trendbar> findAll() {
-        return null;
+        return new ArrayList<>(data.values());
     }
 
     @Override
     public Iterable<Trendbar> findAllById(Iterable<Long> iterable) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -68,21 +72,21 @@ public class TrendbarRepository implements CrudRepository<Trendbar, Long> {
 
     @Override
     public void deleteById(Long id) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void delete(Trendbar trendbar) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void deleteAll(Iterable<? extends Trendbar> iterable) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void deleteAll() {
-
+        throw new UnsupportedOperationException();
     }
 }
