@@ -1,20 +1,25 @@
 package net.vokhmin.exam.fxpro.service;
 
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RequiredArgsConstructor
 public class QuoteProviders {
 
     private final ExecutorService executor = Executors.newCachedThreadPool();
     private final Map<QuoteProducer, Future> producers = new ConcurrentHashMap();
     private final QuoteConsumer consumer;
 
-    QuoteProducer register(QuoteProducerFactory factory) {
+    public QuoteProviders(QuoteConsumer consumer) {
+        this.consumer = consumer;
+    }
+
+    public QuoteProducer register(QuoteProducerFactory factory) {
         final QuoteProducer producer = factory.createProducer(consumer);
         if (producers.containsKey(producer)) {
             throw new RuntimeException("Producer has been registered already");
@@ -25,7 +30,7 @@ public class QuoteProviders {
         return producer;
     }
 
-    void unregister(AbstractQuoteProducer producer) {
+    public void unregister(QuoteProducer producer) {
         final Future future;
         synchronized (producer) {
             future = producers.remove(producer);

@@ -23,11 +23,11 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.Test;
 
 import lombok.extern.slf4j.Slf4j;
 import net.vokhmin.exam.fxpro.domain.Quote;
@@ -39,9 +39,11 @@ import net.vokhmin.exam.fxpro.service.TrendbarServiceFacade;
 import net.vokhmin.exam.fxpro.service.TrendbarStorage;
 
 @Slf4j
-@SpringBootTest
-@ContextConfiguration(classes = TrendbarsConfig.class)
-class IntegrationTest {
+@Test
+@ContextConfiguration(classes = {
+        TrendbarsConfig.class
+})
+public class TrendbarServiceIntegrationTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     BlockingQueue<Quote> quotes;
@@ -54,46 +56,57 @@ class IntegrationTest {
 
     @Test
     @DirtiesContext
-    void testAsService() {
-        final Symbol symbol = randomSymbol();
-        final Map<TrendbarPeriod, TrendbarRepository> repos = getSymbolRepos(symbol);
+    public void testAsService() {
+        log.info("Start TrendbarServiceIntegrationTest ...");
+        final Symbol symbolA = randomSymbol();
+        final Symbol symbolB = randomSymbol();
+        final Map<TrendbarPeriod, TrendbarRepository> reposA = getSymbolRepos(symbolA);
+        final Map<TrendbarPeriod, TrendbarRepository> reposB = getSymbolRepos(symbolB);
         final Thread thread = new Thread(worker);
         thread.start();
         final BigDecimal price = nextBigDecimal();
         final long timestamp = System.currentTimeMillis() - D1.milliseconds();
         service.accept(
-                quoteOf(symbol, timestamp, price)
+                quoteOf(symbolA, timestamp, price)
         );
         service.accept(
-                quoteOf(symbol, timestamp + M1.milliseconds(), price)
+                quoteOf(symbolB, timestamp, price)
         );
-        await().atMost(1, SECONDS)
-                .until(() -> repos.get(M1).count(), equalTo(1L));
         service.accept(
-                quoteOf(symbol, timestamp + H1.milliseconds(), price)
+                quoteOf(symbolB, timestamp + M1.milliseconds(), price)
         );
-        await().atMost(1, SECONDS)
-                .until(() -> repos.get(H1).count(), equalTo(1L));
         service.accept(
-                quoteOf(symbol, timestamp + D1.milliseconds(), price)
+                quoteOf(symbolA, timestamp + M1.milliseconds(), price)
         );
         await().atMost(1, SECONDS)
-                .until(() -> repos.get(D1).count(), equalTo(1L));
+                .until(() -> reposA.get(M1).count(), equalTo(1L));
+        await().atMost(1, SECONDS)
+                .until(() -> reposB.get(M1).count(), equalTo(1L));
+        service.accept(
+                quoteOf(symbolA, timestamp + H1.milliseconds(), price)
+        );
+        await().atMost(1, SECONDS)
+                .until(() -> reposA.get(H1).count(), equalTo(1L));
+        service.accept(
+                quoteOf(symbolA, timestamp + D1.milliseconds(), price)
+        );
+        await().atMost(1, SECONDS)
+                .until(() -> reposA.get(D1).count(), equalTo(1L));
         assertThat(
-                service.getSeries(symbol, M1, bornTime(M1, timestamp), null),
+                service.getSeries(symbolA, M1, bornTime(M1, timestamp), null),
                 contains(
                         newbornTrendbar(M1, bornTime(M1, timestamp), price),
                         newbornTrendbar(M1, bornTime(M1, timestamp + M1.milliseconds()), price),
                         newbornTrendbar(M1, bornTime(M1, timestamp) + H1.milliseconds(), price)
                 ));
         assertThat(
-                service.getSeries(symbol, H1, bornTime(H1, timestamp), null),
+                service.getSeries(symbolA, H1, bornTime(H1, timestamp), null),
                 contains(
                         newbornTrendbar(H1, bornTime(H1, timestamp), price),
                         newbornTrendbar(H1, bornTime(H1, timestamp + H1.milliseconds()), price)
                 ));
         assertThat(
-                service.getSeries(symbol, D1, bornTime(D1, timestamp), null),
+                service.getSeries(symbolA, D1, bornTime(D1, timestamp), null),
                 contains(
                         newbornTrendbar(D1, bornTime(D1, timestamp), price)
                 ));

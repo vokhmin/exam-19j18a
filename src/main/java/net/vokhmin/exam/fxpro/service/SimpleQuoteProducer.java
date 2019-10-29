@@ -15,7 +15,7 @@ import net.vokhmin.exam.fxpro.domain.Quote;
 import net.vokhmin.exam.fxpro.domain.Symbol;
 
 @Slf4j
-public class SimpleQuoteProducer extends AbstractQuoteProducer implements Runnable, QuoteHandler {
+public class SimpleQuoteProducer extends AbstractQuoteProducer implements QuoteHandler {
 
     private static final int SLEEP_LIMIT_MS = 10000;
     private static final int PRICE_MAX = 100;
@@ -27,24 +27,8 @@ public class SimpleQuoteProducer extends AbstractQuoteProducer implements Runnab
     private final Random random = new Random();
 
     public SimpleQuoteProducer(BlockingQueue<Quote> quotes, TimeService time) {
-        super(null);
         this.quotes = quotes;
         this.time = time;
-    }
-
-    @Override
-    public void run() {
-        try {
-            BigDecimal prev = valueOf(random.nextDouble() * random.nextInt(PRICE_MAX));
-            while (isRunning()) {
-                Thread.sleep(random.nextInt(SLEEP_LIMIT_MS));
-                final Quote quote = quoteOf(randomSymbol(), now(), randomPrice(prev));
-                log.debug("Try to originate a new quote - {}", quote);
-                quotes.put(quote);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     private BigDecimal randomPrice(BigDecimal prev) {
@@ -79,7 +63,14 @@ public class SimpleQuoteProducer extends AbstractQuoteProducer implements Runnab
     }
 
     @Override
-    protected Thread newThread() {
+    public Void call() throws Exception {
+        BigDecimal prev = valueOf(random.nextDouble() * random.nextInt(PRICE_MAX));
+        while (isRunning()) {
+            Thread.sleep(random.nextInt(SLEEP_LIMIT_MS));
+            final Quote quote = quoteOf(randomSymbol(), now(), randomPrice(prev));
+            log.debug("Try to originate a new quote - {}", quote);
+            quotes.put(quote);
+        }
         return null;
     }
 }

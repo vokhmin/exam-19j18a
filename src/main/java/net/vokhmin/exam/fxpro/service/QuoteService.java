@@ -1,5 +1,8 @@
 package net.vokhmin.exam.fxpro.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 import net.vokhmin.exam.fxpro.domain.Quote;
 import net.vokhmin.exam.fxpro.domain.Symbol;
@@ -11,7 +14,7 @@ import net.vokhmin.exam.fxpro.domain.Trendbars;
 public class QuoteService implements QuoteHandler {
 
     private final TrendbarStorage storage;
-    private final Trendbar[] currents = new Trendbar[TrendbarPeriod.values().length];
+    private final Map<Symbol, Trendbar[]> currents = new HashMap<>();
 
     public QuoteService(TrendbarStorage storage) {
         this.storage = storage;
@@ -34,18 +37,18 @@ public class QuoteService implements QuoteHandler {
     public void handle(Quote quote) {
         log.debug("Try to handle a quote {}", quote);
         for (final TrendbarPeriod type : TrendbarPeriod.values()) {
-            final Trendbar current = currents[type.ordinal()];
+            final Trendbar current = getCurrents(quote.symbol, type);
             final long origin = Trendbars.bornTime(type, quote.timestamp);
             if (current == null) {
-                currents[type.ordinal()] = Trendbars.firstborn(type, origin, quote.getPrice());
+                setCurrents(quote.symbol, type, Trendbars.firstborn(type, origin, quote.getPrice()));
             } else {
                 switch (Long.compare(current.id.timestamp, origin)) {
                     case -1:    // the next trendbar generation
                         onComplete(quote.symbol, current);
-                        currents[type.ordinal()] = Trendbars.newborn(current, quote);
+                        setCurrents(quote.symbol, type, Trendbars.newborn(current, quote));
                         break;
                     case 0:     // the same trendbar generation
-                        currents[type.ordinal()] = Trendbars.mutant(current, quote);
+                        setCurrents(quote.symbol, type, Trendbars.mutant(current, quote));
                         break;
                     case 1:    // unexpectedly a belated quote! the previous trendbar generation
                         handleBelated(quote);
@@ -54,6 +57,14 @@ public class QuoteService implements QuoteHandler {
             }
         }
         log.debug("The quote {} has been handled", quote);
+    }
+
+    private void setCurrents(Symbol symbol, TrendbarPeriod type, Trendbar bar) {
+        currents.get(symbol)[type.ordinal()] = bar;
+    }
+
+    private Trendbar getCurrents(Symbol symbol, TrendbarPeriod type) {
+        return currents.computeIfAbsent(symbol, s -> new Trendbar[TrendbarPeriod.values().length])[type.ordinal()];
     }
 
     @Override

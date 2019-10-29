@@ -1,7 +1,5 @@
 package net.vokhmin.exam.fxpro.service;
 
-import java.util.concurrent.Callable;
-
 public abstract class AbstractQuoteProducer implements QuoteProducer {
 
     private volatile boolean active;
